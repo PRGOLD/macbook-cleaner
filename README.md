@@ -1,47 +1,76 @@
 # 🍎 MacBook Cleaner
 
-A simple toolkit to keep your MacBook clean, organised, and secure.
+A toolkit to keep your MacBook clean, organised, and secure — available as a native macOS app or a command-line script.
 
 ## What's included
 
-| File | Description |
-|------|-------------|
-| `mac_cleanup.sh` | Shell script — safely clears Trash, caches, temp files, old logs, Xcode derived data, and Docker images |
-| `mac_clean_guide.html` | Interactive HTML checklist covering disk space, file organisation, and security & privacy |
+| File/Folder | Description |
+|-------------|-------------|
+| `macos-app/` | Native macOS SwiftUI app with a dashboard UI |
+| `mac_cleanup.sh` | Bash script — same cleanup logic, runs in Terminal |
+| `mac_clean_guide.html` | Interactive HTML checklist for disk space, organisation & security |
 
-## Quick start
+---
 
-### Run the cleanup script
+## macOS App (Recommended)
+
+A native SwiftUI dashboard app built for macOS. Shows live disk usage and lets you run each cleanup section individually or all at once.
+
+### Requirements
+
+- macOS 13 Ventura or later
+- Xcode 15 or later
+
+### Build & run
 
 ```bash
 # Clone the repo
 git clone https://github.com/PRGOLD/macbook-cleaner.git
-cd macbook-cleaner
 
-# Make the script executable and run it
+# Open the Xcode project
+open macos-app/MacCleaner/MacCleaner.xcodeproj
+```
+
+Then press **⌘R** in Xcode to build and run.
+
+### What it cleans
+
+| Section | What it does |
+|---------|-------------|
+| 🗑️ Empty Trash | Permanently removes everything in `~/.Trash` |
+| 📦 User Caches | Clears stale cache files from `~/Library/Caches` |
+| 🌡️ Temp Files | Removes temporary files older than 3 days |
+| 📋 Old Logs | Deletes log files older than 30 days |
+| 🛠️ Xcode DerivedData | Clears Xcode build artefacts (safe to delete any time) |
+| 🔍 Orphaned App Data | Finds leftover files from applications you've deleted |
+
+---
+
+## Bash Script
+
+For those who prefer the terminal.
+
+```bash
+cd macbook-cleaner
 chmod +x mac_cleanup.sh
 ./mac_cleanup.sh
 ```
 
-### Open the guide
+Covers the same sections as the app, plus optional Docker cleanup (`docker system prune`).
 
-Simply open `mac_clean_guide.html` in your browser. Tick off items as you go — your progress is saved automatically.
+---
 
-## What the script cleans
+## HTML Guide
 
-- 🗑️ **Trash** — empties `~/.Trash`
-- 📦 **User caches** — removes stale `.cache` files from `~/Library/Caches`
-- 🌡️ **Temp files** — removes files older than 3 days from `/private/tmp`
-- 📋 **Old logs** — removes log files older than 30 days from `~/Library/Logs`
-- 🛠️ **Xcode DerivedData** — optional, prompts before deleting
-- 🐳 **Docker** — optional `docker system prune` if Docker is running
+Open `mac_clean_guide.html` in any browser. Tick off items as you go — your progress is saved automatically.
 
-## What the guide covers
+Covers:
+1. **Disk Space** — Storage tool, large files, old backups
+2. **File Organisation** — Desktop, Downloads, iCloud Drive, app cleanup
+3. **Security & Privacy** — FileVault, Firewall, Login Items, 2FA, malware scan
+4. **Bonus** — Performance tips and battery health
 
-1. **Disk Space** — built-in macOS Storage tool, finding large files, removing old backups
-2. **File Organisation** — Desktop, Downloads, folder structure, iCloud Drive, app cleanup
-3. **Security & Privacy** — FileVault, Firewall, Login Items, password manager, 2FA, malware scan
-4. **Bonus** — performance tips and battery health
+---
 
 ## License
 
