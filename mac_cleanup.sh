@@ -88,71 +88,80 @@ else
 fi
 
 # ── 7. Orphaned App Leftovers ─────────────────────────────
+# Compatible with bash 3.2 (macOS default) — no associative arrays or ${var,,}
 section "7 / 7  Orphaned Application Leftovers"
 echo "  Scanning installed applications (this may take a moment)..."
 
-# Build lookup arrays of installed bundle IDs and app names
-declare -A KNOWN_IDS     # bundle IDs  → 1
-declare -A KNOWN_NAMES   # app names (lowercased) → 1
+# Helper: portable lowercase using tr
+lc() { echo "$1" | tr '[:upper:]' '[:lower:]'; }
 
-# Add known Apple / system namespaces to always skip
-ALWAYS_SKIP_PREFIXES=(
-    "com.apple"
-    "com.microsoft"   # Office apps use many sub-folders
-)
+# Build plain arrays of bundle IDs and app names from all installed .app bundles
+BUNDLE_IDS=()
+APP_NAMES=()
 
 while IFS= read -r -d '' app; do
-    # Bundle ID
     bid=$(defaults read "${app}/Contents/Info" CFBundleIdentifier 2>/dev/null || true)
-    [[ -n "$bid" ]] && KNOWN_IDS["$bid"]=1
-
-    # App name (lower-cased, without .app)
+    [[ -n "$bid" ]] && BUNDLE_IDS+=("$bid")
     aname=$(basename "$app" .app)
-    [[ -n "$aname" ]] && KNOWN_NAMES["${aname,,}"]=1
+    [[ -n "$aname" ]] && APP_NAMES+=("$(lc "$aname")")
 done < <(find /Applications ~/Applications /System/Applications \
               -maxdepth 4 -name "*.app" -print0 2>/dev/null)
 
-echo "  Indexed ${#KNOWN_IDS[@]} bundle IDs and ${#KNOWN_NAMES[@]} app names"
+echo "  Indexed ${#BUNDLE_IDS[@]} bundle IDs and ${#APP_NAMES[@]} app names"
 
 # ── Helper: return 0 (true) if entry looks like it belongs to an installed app
 is_known() {
-    local raw="$1"
     local name
-    name=$(basename "$raw")
-    local name_lc="${name,,}"
+    name=$(basename "$1")
+    local name_lc
+    name_lc=$(lc "$name")
 
-    # Always skip hidden entries and pure Apple/system namespaces
+    # Skip hidden entries
     [[ "$name" == .* ]] && return 0
-    for pfx in "${ALWAYS_SKIP_PREFIXES[@]}"; do
-        [[ "$name_lc" == "${pfx}"* ]] && return 0
-    done
+
+    # Always skip Apple and Microsoft namespaces (system / Office suites)
+    case "$name_lc" in
+        com.apple.*|com.microsoft.*) return 0 ;;
+    esac
 
     # Exact bundle-ID match
-    [[ -n "${KNOWN_IDS[$name]+x}" ]] && return 0
+    local bid
+    for bid in "${BUNDLE_IDS[@]+"${BUNDLE_IDS[@]}"}"; do
+        [[ "$name" == "$bid" ]] && return 0
+    done
 
     # Exact app-name match (case-insensitive)
-    [[ -n "${KNOWN_NAMES[$name_lc]+x}" ]] && return 0
+    local aname
+    for aname in "${APP_NAMES[@]+"${APP_NAMES[@]}"}"; do
+        [[ "$name_lc" == "$aname" ]] && return 0
+    done
 
-    # Fuzzy: name is a component inside a bundle ID (e.g. "Spotify" in "com.spotify.client")
-    for bid in "${!KNOWN_IDS[@]}"; do
-        local bid_lc="${bid,,}"
+    # Fuzzy: folder name appears as a component inside any bundle ID
+    # e.g. "Spotify" matches "com.spotify.client"
+    for bid in "${BUNDLE_IDS[@]+"${BUNDLE_IDS[@]}"}"; do
+        local bid_lc
+        bid_lc=$(lc "$bid")
         [[ "$bid_lc" == *"$name_lc"* ]] && return 0
     done
 
-    # Group Containers use "TEAMID.bundleid" — strip the team prefix and recheck
+    # Group Containers: entries look like "TEAMID.com.company.group"
+    # Strip the 10-char team-ID prefix and re-check
     if [[ "$name" =~ ^[A-Z0-9]{10}\. ]]; then
-        local stripped="${name#*.}"        # remove "XXXXXXXXXX."
-        [[ -n "${KNOWN_IDS[$stripped]+x}" ]] && return 0
-        local stripped_lc="${stripped,,}"
-        for bid in "${!KNOWN_IDS[@]}"; do
-            [[ "${bid,,}" == *"$stripped_lc"* ]] && return 0
+        local stripped="${name#*.}"
+        local stripped_lc
+        stripped_lc=$(lc "$stripped")
+        for bid in "${BUNDLE_IDS[@]+"${BUNDLE_IDS[@]}"}"; do
+            local bid_lc
+            bid_lc=$(lc "$bid")
+            [[ "$stripped" == "$bid" ]] && return 0
+            [[ "$bid_lc" == *"$stripped_lc"* ]] && return 0
         done
     fi
 
-    return 1   # not matched → orphan candidate
+    return 1  # no match → orphan candidate
 }
 
-# ── Scan directories and collect orphan candidates
+# ── Scan and collect orphan candidates
 ORPHANS=()
 
 scan_for_orphans() {
@@ -182,7 +191,6 @@ else
     printf "  %-8s  %s\n" "SIZE" "PATH"
     printf "  %-8s  %s\n" "────" "────────────────────────────────────"
 
-    # Sort by size descending (human-readable — approximate, good enough for display)
     IFS=$'\n' sorted_orphans=($(printf '%s\n' "${ORPHANS[@]}" | sort -rh))
     unset IFS
 
@@ -212,7 +220,7 @@ else
                 echo
                 echo "  📁  $(basename "$path")  ($sz)"
                 echo "       $path"
-                read -r -p "       Delete this? [y/N] " reply
+                read -r -p "       Delete this? [y/N] \" reply
                 if [[ "$reply" =~ ^[Yy]$ ]]; then
                     rm -rf "$path" && log "Deleted"
                 else
