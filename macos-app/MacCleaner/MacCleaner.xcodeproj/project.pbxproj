@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3220BC1D2F79E5C400922345 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3220BC1C2F79E5C400922345 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		3220BBC82F79BF0C00922345 /* MacCleaner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacCleaner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3220BC1C2F79E5C400922345 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +37,7 @@
 		3220BBBF2F79BF0C00922345 = {
 			isa = PBXGroup;
 			children = (
+				3220BC1C2F79E5C400922345 /* Assets.xcassets */,
 				3220BBCA2F79BF0C00922345 /* MacCleaner */,
 				3220BBC92F79BF0C00922345 /* Products */,
 			);
@@ -109,6 +115,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3220BC1D2F79E5C400922345 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

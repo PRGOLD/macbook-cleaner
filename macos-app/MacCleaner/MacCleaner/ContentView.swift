@@ -48,7 +48,16 @@ struct HeaderView: View {
     let diskInfo: DiskInfo?
     var body: some View {
         HStack(spacing: 16) {
-            Image(systemName: "apple.logo").font(.system(size: 32)).foregroundStyle(.primary)
+            // Replace "apple.logo" with your logo image name
+            // Option 1: Use your custom logo from Assets
+            Image("AppLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 32, height: 32)
+            
+            // Option 2: Keep SF Symbol (comment out the above, uncomment this)
+            // Image(systemName: "apple.logo").font(.system(size: 32)).foregroundStyle(.primary)
+            
             VStack(alignment: .leading, spacing: 2) {
                 Text("MacBook Cleaner").font(.title2.bold())
                 Text("Free up space \u{00B7} Stay organised \u{00B7} Stay secure").font(.callout).foregroundStyle(.secondary)
