@@ -220,7 +220,7 @@ else
                 echo
                 echo "  📁  $(basename "$path")  ($sz)"
                 echo "       $path"
-                read -r -p "       Delete this? [y/N] \" reply
+                read -r -p "       Delete this? [y/N] " reply
                 if [[ "$reply" =~ ^[Yy]$ ]]; then
                     rm -rf "$path" && log "Deleted"
                 else
