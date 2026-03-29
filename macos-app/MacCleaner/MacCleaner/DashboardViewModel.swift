@@ -48,6 +48,18 @@ class DashboardViewModel: ObservableObject {
                        description: "Clears Xcode build artefacts (safe to delete)") {
             try await CleanupEngine.clearXcodeDerivedData()
         },
+        CleanupSection(id: "safari", icon: "safari", title: "Safari Cache",
+                       description: "Remove browser cache and temporary files") {
+            try await CleanupEngine.clearSafariCache()
+        },
+        CleanupSection(id: "downloads", icon: "arrow.down.circle.fill", title: "Old Downloads",
+                       description: "Remove downloads older than 90 days") {
+            try await CleanupEngine.clearOldDownloads()
+        },
+        CleanupSection(id: "developer", icon: "hammer.circle.fill", title: "Developer Caches",
+                       description: "Clear npm, Homebrew, CocoaPods caches") {
+            try await CleanupEngine.clearDeveloperCaches()
+        },
         CleanupSection(id: "orphans", icon: "questionmark.folder.fill", title: "Orphaned App Data",
                        description: "Finds leftover files from deleted applications") {
             try await CleanupEngine.findOrphanedAppSupport()

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var vm = DashboardViewModel()
+    @State private var showSettings = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,6 +22,13 @@ struct ContentView: View {
                      : "Run individual sections or clean everything at once")
                     .font(.callout).foregroundStyle(.secondary)
                 Spacer()
+                Button {
+                    showSettings = true
+                } label: {
+                    Label("Settings", systemImage: "gearshape")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
                 Button { Task { await vm.runAll() } } label: {
                     Label("Clean Everything", systemImage: "sparkles")
                 }
@@ -30,6 +38,9 @@ struct ContentView: View {
         }
         .frame(minWidth: 720, minHeight: 560)
         .task { await vm.refreshDiskInfo() }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
     }
 }
 

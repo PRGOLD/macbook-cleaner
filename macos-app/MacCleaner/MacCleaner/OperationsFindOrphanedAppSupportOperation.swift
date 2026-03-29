@@ -6,6 +6,9 @@ struct FindOrphanedAppSupportOperation: CleanupOperation {
     let name = "Find Orphaned App Support"
     let description = "Detect leftover files from uninstalled applications"
     
+    /// Enable dry run mode (preview without deleting)
+    var dryRun: Bool = false
+    
     /// Directories to scan for installed applications
     let appDirectories: [String]
     
@@ -13,6 +16,7 @@ struct FindOrphanedAppSupportOperation: CleanupOperation {
     let scanDirectories: [String]
     
     init(
+        dryRun: Bool = false,
         appDirectories: [String] = [
             "/Applications",
             NSHomeDirectory() + "/Applications",
@@ -24,6 +28,7 @@ struct FindOrphanedAppSupportOperation: CleanupOperation {
             NSHomeDirectory() + "/Library/Group Containers"
         ]
     ) {
+        self.dryRun = dryRun
         self.appDirectories = appDirectories
         self.scanDirectories = scanDirectories
     }

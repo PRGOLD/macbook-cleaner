@@ -9,27 +9,78 @@ struct CleanupEngine {
     /// while delegating to the new modular operation structs
     
     static func emptyTrash() async throws -> CleanupResult {
-        try await EmptyTrashOperation().execute()
+        var op = EmptyTrashOperation()
+        op.dryRun = CleanupSettings.shared.dryRunMode
+        return try await op.execute()
     }
     
     static func clearUserCaches() async throws -> CleanupResult {
-        try await ClearUserCachesOperation().execute()
+        var op = ClearUserCachesOperation()
+        op.dryRun = CleanupSettings.shared.dryRunMode
+        return try await op.execute()
     }
     
     static func clearTempFiles() async throws -> CleanupResult {
-        try await ClearTempFilesOperation().execute()
+        var op = ClearTempFilesOperation(
+            daysOld: CleanupSettings.shared.tempFileRetentionDays,
+            cacheDaysOld: CleanupSettings.shared.cacheRetentionDays
+        )
+        op.dryRun = CleanupSettings.shared.dryRunMode
+        return try await op.execute()
     }
     
     static func clearOldLogs() async throws -> CleanupResult {
-        try await ClearOldLogsOperation().execute()
+        var op = ClearOldLogsOperation(daysOld: CleanupSettings.shared.logRetentionDays)
+        op.dryRun = CleanupSettings.shared.dryRunMode
+        return try await op.execute()
     }
     
     static func clearXcodeDerivedData() async throws -> CleanupResult {
-        try await ClearXcodeDerivedDataOperation().execute()
+        var op = ClearXcodeDerivedDataOperation()
+        op.dryRun = CleanupSettings.shared.dryRunMode
+        return try await op.execute()
     }
     
     static func findOrphanedAppSupport() async throws -> CleanupResult {
-        try await FindOrphanedAppSupportOperation().execute()
+        var op = FindOrphanedAppSupportOperation()
+        op.dryRun = CleanupSettings.shared.dryRunMode
+        return try await op.execute()
+    }
+    
+    // MARK: - New Operations
+    
+    static func clearSafariCache() async throws -> CleanupResult {
+        let settings = CleanupSettings.shared
+        var op = ClearSafariCacheOperation(
+            dryRun: settings.dryRunMode,
+            clearCookies: settings.clearSafariCookies,
+            clearHistory: settings.clearSafariHistory
+        )
+        op.dryRun = settings.dryRunMode
+        return try await op.execute()
+    }
+    
+    static func clearOldDownloads() async throws -> CleanupResult {
+        let settings = CleanupSettings.shared
+        var op = ClearOldDownloadsOperation(
+            daysOld: settings.downloadRetentionDays,
+            minimumFileSize: settings.minimumFileSize,
+            dryRun: settings.dryRunMode
+        )
+        op.dryRun = settings.dryRunMode
+        return try await op.execute()
+    }
+    
+    static func clearDeveloperCaches() async throws -> CleanupResult {
+        let settings = CleanupSettings.shared
+        var op = ClearDeveloperCachesOperation(
+            dryRun: settings.dryRunMode,
+            clearNpm: settings.clearNpmCache,
+            clearHomebrew: settings.clearHomebrewCache,
+            clearCocoaPods: settings.clearCocoaPodsCache
+        )
+        op.dryRun = settings.dryRunMode
+        return try await op.execute()
     }
     
     // MARK: - Legacy Utility Methods (Deprecated)
@@ -56,13 +107,17 @@ struct CleanupEngine {
     
     /// All available cleanup operations
     static var allOperations: [any CleanupOperation] {
-        [
-            EmptyTrashOperation(),
-            ClearUserCachesOperation(),
-            ClearTempFilesOperation(),
-            ClearOldLogsOperation(),
-            ClearXcodeDerivedDataOperation(),
-            FindOrphanedAppSupportOperation()
+        let settings = CleanupSettings.shared
+        return [
+            EmptyTrashOperation(dryRun: settings.dryRunMode),
+            ClearUserCachesOperation(dryRun: settings.dryRunMode),
+            ClearTempFilesOperation(daysOld: settings.tempFileRetentionDays, cacheDaysOld: settings.cacheRetentionDays, dryRun: settings.dryRunMode),
+            ClearOldLogsOperation(daysOld: settings.logRetentionDays, dryRun: settings.dryRunMode),
+            ClearXcodeDerivedDataOperation(dryRun: settings.dryRunMode),
+            ClearSafariCacheOperation(dryRun: settings.dryRunMode, clearCookies: settings.clearSafariCookies, clearHistory: settings.clearSafariHistory),
+            ClearOldDownloadsOperation(daysOld: settings.downloadRetentionDays, minimumFileSize: settings.minimumFileSize, dryRun: settings.dryRunMode),
+            ClearDeveloperCachesOperation(dryRun: settings.dryRunMode, clearNpm: settings.clearNpmCache, clearHomebrew: settings.clearHomebrewCache, clearCocoaPods: settings.clearCocoaPodsCache),
+            FindOrphanedAppSupportOperation(dryRun: settings.dryRunMode)
         ]
     }
     

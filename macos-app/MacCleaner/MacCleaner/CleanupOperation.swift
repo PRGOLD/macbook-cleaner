@@ -11,6 +11,9 @@ protocol CleanupOperation {
     /// Description of what this operation does
     var description: String { get }
     
+    /// Enable dry run mode (preview without deleting)
+    var dryRun: Bool { get set }
+    
     /// Executes the cleanup operation
     func execute() async throws -> CleanupResult
 }
