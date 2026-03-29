@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MacBook Clean-Up Guide</title>
+<style>
+  :root {
+    --bg: #f5f5f7; --card: #ffffff; --accent: #0071e3; --accent2: #34c759;
+    --warn: #ff9f0a; --danger: #ff3b30; --text: #1d1d1f; --muted: #6e6e73;
+    --border: #d2d2d7; --code-bg: #1e1e2e; --code-text: #cdd6f4; --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 40px 20px 80px; }
+  .container { max-width: 860px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 48px; }
+  header h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.5px; }
+  header p { color: var(--muted); font-size: 1.1rem; margin-top: 8px; }
+  .section-title { font-size: 1.55rem; font-weight: 700; margin: 48px 0 20px; display: flex; align-items: center; gap: 10px; }
+  .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px 28px; margin-bottom: 16px; }
+  .card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
+  .card p, .card li { color: var(--muted); font-size: 0.95rem; }
+  .card ul, .card ol { padding-left: 18px; margin-top: 8px; }
+  .card li { margin-bottom: 6px; }
+  .code-block { background: var(--code-bg); color: var(--code-text); border-radius: 10px; padding: 16px 20px; margin: 14px 0 4px; font-family: "SF Mono", "Menlo", monospace; font-size: 0.85rem; overflow-x: auto; }
+  .code-block .comment { color: #6c7086; }
+  .code-block .cmd { color: #89dceb; }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li input[type="checkbox"] { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
+  .checklist li label { cursor: pointer; }
+  .checklist li label span { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+  .tip-box { background: #f0f8ff; border: 1px solid #b3d9ff; border-radius: 10px; padding: 14px 18px; font-size: 0.9rem; color: #004a8f; margin-top: 12px; }
+  .warn-box { background: #fff8f0; border: 1px solid #ffd9a0; border-radius: 10px; padding: 14px 18px; font-size: 0.9rem; color: #7a4500; margin-top: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 12px; }
+  th { background: var(--bg); text-align: left; padding: 10px 14px; font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--muted); }
+  td:first-child { color: var(--text); font-weight: 500; }
+  footer { text-align: center; margin-top: 60px; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🍎 MacBook Clean-Up Guide</h1>
+    <p>Disk Space · File Organization · Security &amp; Privacy</p>
+  </header>
+
+  <div class="section-title"><span>💾</span> 1 — Free Up Disk Space</div>
+
+  <div class="card">
+    <h3>🚀 Quickest Win: Run the Cleanup Script</h3>
+    <p>Clone the repo and run in Terminal:</p>
+    <div class="code-block">
+      <div class="comment"># Clone and run</div>
+      <div class="cmd">git clone https://github.com/PRGOLD/macbook-cleaner.git</div>
+      <div class="cmd">cd macbook-cleaner && chmod +x mac_cleanup.sh && ./mac_cleanup.sh</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🍎 Built-in macOS Storage Management</h3>
+    <ol>
+      <li>Go to <strong>Apple menu → System Settings → General → Storage</strong></li>
+      <li>Click ⓘ next to categories to see what's taking space</li>
+      <li>Use <strong>Optimize Storage</strong>, <strong>Empty Trash Automatically</strong>, and review <strong>Large Files</strong></li>
+    </ol>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>📦 Common Space Hogs</h3>
+      <table>
+        <tr><th>Location</th><th>Typical Size</th></tr>
+        <tr><td>~/Downloads</td><td>1–20 GB</td></tr>
+        <tr><td>~/Library/Caches</td><td>1–10 GB</td></tr>
+        <tr><td>Xcode DerivedData</td><td>5–50 GB</td></tr>
+        <tr><td>Docker images</td><td>5–30 GB</td></tr>
+        <tr><td>~/Movies / ~/Photos</td><td>10–100 GB+</td></tr>
+        <tr><td>Old iOS backups</td><td>5–20 GB</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h3>🔍 Find Big Files via Terminal</h3>
+      <p>Largest items in your home folder:</p>
+      <div class="code-block"><div class="cmd">du -sh ~/* 2>/dev/null | sort -rh | head -20</div></div>
+      <p style="margin-top:10px;">Files larger than 500 MB:</p>
+      <div class="code-block"><div class="cmd">find ~ -size +500M -not -path "*/.*" 2>/dev/null</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📱 Remove Old iPhone/iPad Backups</h3>
+    <ol>
+      <li>Open <strong>Finder</strong> → click your device in the sidebar → <strong>Manage Backups…</strong></li>
+      <li>Delete backups you no longer need</li>
+    </ol>
+    <div class="tip-box">💡 If you use iCloud Backup, you may not need local backups at all.</div>
+  </div>
+
+  <div class="section-title"><span>🗂️</span> 2 — Organise Your Files</div>
+
+  <div class="card">
+    <h3>✅ Organisation Checklist</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="o1"><label for="o1">Clear your Desktop — move everything into folders or delete it<span>A cluttered Desktop slows down Finder and Spotlight</span></label></li>
+      <li><input type="checkbox" id="o2"><label for="o2">Sort ~/Downloads — delete installers &amp; old files<span>Sort by Date Added and work from the oldest</span></label></li>
+      <li><input type="checkbox" id="o3"><label for="o3">Create a simple folder structure in ~/Documents<span>e.g. Work / Personal / Finance / Archive / Inbox</span></label></li>
+      <li><input type="checkbox" id="o4"><label for="o4">Use Finder Tags to colour-code ongoing projects<span>Tags are searchable in Spotlight</span></label></li>
+      <li><input type="checkbox" id="o5"><label for="o5">Enable iCloud Drive → Optimise Mac Storage<span>System Settings → Apple ID → iCloud → iCloud Drive</span></label></li>
+      <li><input type="checkbox" id="o6"><label for="o6">Archive old projects — zip them or move to an external drive</label></li>
+      <li><input type="checkbox" id="o7"><label for="o7">Empty your email Downloads folder<span>Mail saves attachments to ~/Library/Mail Downloads</span></label></li>
+      <li><input type="checkbox" id="o8"><label for="o8">Uninstall apps you haven't opened in 6+ months<span>Use AppCleaner (free) to remove app leftovers</span></label></li>
+    </ul>
+  </div>
+
+  <div class="section-title"><span>🔒</span> 3 — Security &amp; Privacy</div>
+
+  <div class="card">
+    <h3>🛡️ Security Checklist</h3>
+    <ul class="checklist">
+      <li><input type="checkbox" id="s1"><label for="s1">Keep macOS up to date<span>System Settings → General → Software Update → enable automatic updates</span></label></li>
+      <li><input type="checkbox" id="s2"><label for="s2">Enable FileVault (disk encryption)<span>System Settings → Privacy &amp; Security → FileVault → Turn On</span></label></li>
+      <li><input type="checkbox" id="s3"><label for="s3">Enable the Firewall<span>System Settings → Network → Firewall → Turn On</span></label></li>
+      <li><input type="checkbox" id="s4"><label for="s4">Check app permissions (Camera, Mic, Location)<span>System Settings → Privacy &amp; Security</span></label></li>
+      <li><input type="checkbox" id="s5"><label for="s5">Review Login Items &amp; Launch Agents<span>System Settings → General → Login Items</span></label></li>
+      <li><input type="checkbox" id="s6"><label for="s6">Use a password manager (1Password, Bitwarden, or Keychain)<span>Stop reusing passwords — #1 way accounts get compromised</span></label></li>
+      <li><input type="checkbox" id="s7"><label for="s7">Enable two-factor authentication on Apple ID &amp; email</label></li>
+      <li><input type="checkbox" id="s8"><label for="s8">Check for compromised passwords<span>Safari → Settings → Passwords → Security Recommendations</span></label></li>
+      <li><input type="checkbox" id="s9"><label for="s9">Run a malware scan with Malwarebytes (free)<span>malwarebytes.com — scans for adware, PUPs, and malware</span></label></li>
+      <li><input type="checkbox" id="s10"><label for="s10">Review browser extensions — remove anything unused or untrustworthy</label></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>🔍 Check Login Items via Terminal</h3>
+    <div class="code-block">
+      <div class="comment"># User LaunchAgents</div>
+      <div class="cmd">ls -la ~/Library/LaunchAgents/</div>
+      <div class="comment"># System-wide LaunchAgents</div>
+      <div class="cmd">ls -la /Library/LaunchAgents/</div>
+    </div>
+    <div class="warn-box">⚠️ Don't delete LaunchAgents unless you're sure what they are — some are required by legitimate apps.</div>
+  </div>
+
+  <div class="section-title"><span>⚡</span> Bonus — Speed &amp; Battery</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🐢 Mac Running Slow?</h3>
+      <ul>
+        <li>Open <strong>Activity Monitor</strong> → check CPU and Memory tabs for resource hogs</li>
+        <li>Reduce Login Items (see Security section above)</li>
+        <li>Restart your Mac to clear RAM</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🔋 Battery Health</h3>
+      <ul>
+        <li>System Settings → Battery → Battery Health → Optimized Battery Charging</li>
+        <li>Hold ⌥ → Apple Menu → System Information → Power to check cycle count</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>MacBook Cleaner · <a href="https://github.com/PRGOLD/macbook-cleaner">github.com/PRGOLD/macbook-cleaner</a></footer>
+</div>
+<script>
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    const key = 'mac_clean_' + cb.id;
+    cb.checked = localStorage.getItem(key) === 'true';
+    cb.addEventListener('change', () => localStorage.setItem(key, cb.checked));
+  });
+</script>
+</body>
+</html>
