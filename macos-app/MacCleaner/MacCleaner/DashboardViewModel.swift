@@ -21,6 +21,7 @@ struct DiskInfo {
 @MainActor
 class DashboardViewModel: ObservableObject {
     @Published var diskInfo: DiskInfo?
+    @Published var diskInfoBeforeCleanup: DiskInfo?
     @Published var isRunning = false
 
     var totalFreed: Int64 {
@@ -76,6 +77,9 @@ class DashboardViewModel: ObservableObject {
 
     func runAll() async {
         isRunning = true
+        // Capture disk state before cleanup
+        diskInfoBeforeCleanup = diskInfo
+        
         for section in sections { await section.run() }
         await refreshDiskInfo()
         isRunning = false

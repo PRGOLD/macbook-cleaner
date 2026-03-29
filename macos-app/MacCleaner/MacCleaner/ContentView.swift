@@ -1,4 +1,5 @@
 import SwiftUI
+import Charts
 
 struct ContentView: View {
     @StateObject private var vm = DashboardViewModel()
@@ -6,19 +7,228 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // Demo Mode Banner
+            if CleanupSettings.shared.dryRunMode {
+                HStack {
+                    Image(systemName: "eye.fill")
+                    Text("Demo Mode - No files will be deleted")
+                        .font(.callout.bold())
+                    Spacer()
+                    Button("Disable") {
+                        CleanupSettings.shared.dryRunMode = false
+                        CleanupSettings.shared.save()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(.orange.gradient)
+            }
+            
             HeaderView(diskInfo: vm.diskInfo)
                 .padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 16)
             Divider()
             ScrollView {
                 VStack(spacing: 16) {
-                    // Disk Usage Chart
-                    DiskUsageChartView(diskInfo: vm.diskInfo)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 8)
+                    // Side-by-side disk charts
+                    HStack(spacing: 24) {
+                        // Left: Current Disk State
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Current Disk Usage")
+                                .font(.headline)
+                            
+                            if let disk = vm.diskInfo {
+                                Chart {
+                                    SectorMark(
+                                        angle: .value("Used", disk.used),
+                                        innerRadius: .ratio(0.618),
+                                        angularInset: 1.5
+                                    )
+                                    .foregroundStyle(.blue.gradient)
+                                    
+                                    SectorMark(
+                                        angle: .value("Free", disk.free),
+                                        innerRadius: .ratio(0.618),
+                                        angularInset: 1.5
+                                    )
+                                    .foregroundStyle(.green.gradient)
+                                }
+                                .frame(height: 180)
+                                .chartLegend(.hidden)
+                                
+                                VStack(spacing: 4) {
+                                    Text("\(Int(disk.usedFraction * 100))% Used")
+                                        .font(.title3.bold())
+                                    Text(disk.freeFormatted + " free")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                // Labels
+                                HStack(spacing: 16) {
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(.blue.gradient)
+                                            .frame(width: 8, height: 8)
+                                        Text("Used")
+                                            .font(.caption2)
+                                    }
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(.green.gradient)
+                                            .frame(width: 8, height: 8)
+                                        Text("Free")
+                                            .font(.caption2)
+                                    }
+                                }
+                            } else {
+                                ProgressView()
+                                    .frame(height: 180)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        
+                        // Right: After Cleanup State
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack {
+                                Text("After Cleanup")
+                                    .font(.headline)
+                                if vm.totalFreed > 0 {
+                                    Spacer()
+                                    Text("↑ \(CleanupUtilities.formatBytes(vm.totalFreed))")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(.green)
+                                }
+                            }
+                            
+                            if vm.totalFreed > 0, let after = vm.diskInfo {
+                                // Show actual after state with colors
+                                Chart {
+                                    SectorMark(
+                                        angle: .value("Used", after.used),
+                                        innerRadius: .ratio(0.618),
+                                        angularInset: 1.5
+                                    )
+                                    .foregroundStyle(.blue.gradient)
+                                    
+                                    SectorMark(
+                                        angle: .value("Free", after.free),
+                                        innerRadius: .ratio(0.618),
+                                        angularInset: 1.5
+                                    )
+                                    .foregroundStyle(.green.gradient)
+                                }
+                                .frame(height: 180)
+                                .chartLegend(.hidden)
+                                
+                                VStack(spacing: 4) {
+                                    Text("\(Int(after.usedFraction * 100))% Used")
+                                        .font(.title3.bold())
+                                    Text(after.freeFormatted + " free")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                // Labels
+                                HStack(spacing: 16) {
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(.blue.gradient)
+                                            .frame(width: 8, height: 8)
+                                        Text("Used")
+                                            .font(.caption2)
+                                    }
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(.green.gradient)
+                                            .frame(width: 8, height: 8)
+                                        Text("Free")
+                                            .font(.caption2)
+                                    }
+                                }
+                            } else if vm.diskInfoBeforeCleanup != nil, let after = vm.diskInfo {
+                                // Show after chart even if nothing was freed (0 bytes)
+                                Chart {
+                                    SectorMark(
+                                        angle: .value("Used", after.used),
+                                        innerRadius: .ratio(0.618),
+                                        angularInset: 1.5
+                                    )
+                                    .foregroundStyle(.blue.gradient)
+                                    
+                                    SectorMark(
+                                        angle: .value("Free", after.free),
+                                        innerRadius: .ratio(0.618),
+                                        angularInset: 1.5
+                                    )
+                                    .foregroundStyle(.green.gradient)
+                                }
+                                .frame(height: 180)
+                                .chartLegend(.hidden)
+                                
+                                VStack(spacing: 4) {
+                                    Text("\(Int(after.usedFraction * 100))% Used")
+                                        .font(.title3.bold())
+                                    Text(after.freeFormatted + " free")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                
+                                // Labels
+                                HStack(spacing: 16) {
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(.blue.gradient)
+                                            .frame(width: 8, height: 8)
+                                        Text("Used")
+                                            .font(.caption2)
+                                    }
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(.green.gradient)
+                                            .frame(width: 8, height: 8)
+                                        Text("Free")
+                                            .font(.caption2)
+                                    }
+                                }
+                            } else {
+                                // Show grey placeholder before cleanup
+                                Chart {
+                                    SectorMark(
+                                        angle: .value("Empty", 1),
+                                        innerRadius: .ratio(0.618),
+                                        angularInset: 1.5
+                                    )
+                                    .foregroundStyle(.gray.opacity(0.2))
+                                }
+                                .frame(height: 180)
+                                .chartLegend(.hidden)
+                                
+                                VStack(spacing: 4) {
+                                    Text("—")
+                                        .font(.title3.bold())
+                                        .foregroundStyle(.secondary)
+                                    Text("Run cleanup to see results")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    }
+                    .padding(.horizontal, 24)
                     
                     // Cleanup Operations Grid
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                        ForEach(vm.sections) { section in SectionCard(section: section) }
+                        ForEach(vm.sections) { section in 
+                            SectionCard(section: section, viewModel: vm)
+                        }
                     }
                 }
                 .padding(24)
@@ -85,6 +295,8 @@ struct HeaderView: View {
 
 struct SectionCard: View {
     @ObservedObject var section: CleanupSection
+    @ObservedObject var viewModel: DashboardViewModel
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 10) {
@@ -127,12 +339,63 @@ struct SectionCard: View {
                 .padding(8).background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
             }
             Spacer(minLength: 0)
-            Button { Task { await section.run() } } label: {
-                Label(section.status == .running ? "Running\u{2026}" : "Run",
-                      systemImage: section.status == .running ? "hourglass" : "play.fill")
-                    .frame(maxWidth: .infinity)
+            HStack(spacing: 8) {
+                // Evaluate button (Dry run)
+                Button {
+                    Task {
+                        // Capture before state if not already captured
+                        if viewModel.diskInfoBeforeCleanup == nil {
+                            viewModel.diskInfoBeforeCleanup = viewModel.diskInfo
+                        }
+                        
+                        // Save current dry run state
+                        let originalDryRun = CleanupSettings.shared.dryRunMode
+                        // Enable dry run for evaluation
+                        CleanupSettings.shared.dryRunMode = true
+                        await section.run()
+                        // Restore original state
+                        CleanupSettings.shared.dryRunMode = originalDryRun
+                        
+                        // Refresh disk info
+                        await viewModel.refreshDiskInfo()
+                    }
+                } label: {
+                    Label("Evaluate", systemImage: "eye")
+                        .frame(maxWidth: .infinity)
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+                .disabled(section.status == .running)
+                .controlSize(.small)
+                
+                // Execute button (Real run)
+                Button {
+                    Task {
+                        // Capture before state if not already captured
+                        if viewModel.diskInfoBeforeCleanup == nil {
+                            viewModel.diskInfoBeforeCleanup = viewModel.diskInfo
+                        }
+                        
+                        // Save current dry run state
+                        let originalDryRun = CleanupSettings.shared.dryRunMode
+                        // Disable dry run for execution
+                        CleanupSettings.shared.dryRunMode = false
+                        await section.run()
+                        // Restore original state
+                        CleanupSettings.shared.dryRunMode = originalDryRun
+                        
+                        // Refresh disk info
+                        await viewModel.refreshDiskInfo()
+                    }
+                } label: {
+                    Label("Execute", systemImage: "bolt.fill")
+                        .frame(maxWidth: .infinity)
+                        .font(.caption)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(section.status == .running)
+                .controlSize(.small)
             }
-            .buttonStyle(.bordered).disabled(section.status == .running).controlSize(.small)
         }
         .padding(16).frame(maxWidth: .infinity, minHeight: 160, alignment: .topLeading)
         .background(.background).clipShape(RoundedRectangle(cornerRadius: 12))
