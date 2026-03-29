@@ -10,8 +10,16 @@ struct ContentView: View {
                 .padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 16)
             Divider()
             ScrollView {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                    ForEach(vm.sections) { section in SectionCard(section: section) }
+                VStack(spacing: 16) {
+                    // Disk Usage Chart
+                    DiskUsageChartView(diskInfo: vm.diskInfo)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 8)
+                    
+                    // Cleanup Operations Grid
+                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                        ForEach(vm.sections) { section in SectionCard(section: section) }
+                    }
                 }
                 .padding(24)
             }
@@ -88,7 +96,14 @@ struct SectionCard: View {
                 Spacer()
             }
             if section.status == .running {
-                ProgressView().controlSize(.small).frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 6) {
+                    ProgressView(value: section.progress) {
+                        Text("Processing...")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .controlSize(.small)
+                }
             } else if let result = section.result {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 4) {

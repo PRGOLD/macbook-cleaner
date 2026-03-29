@@ -14,6 +14,9 @@ protocol CleanupOperation {
     /// Enable dry run mode (preview without deleting)
     var dryRun: Bool { get set }
     
+    /// Progress callback (optional, for operations that support it)
+    var progressHandler: ((Double, String) -> Void)? { get set }
+    
     /// Executes the cleanup operation
     func execute() async throws -> CleanupResult
 }
@@ -21,4 +24,8 @@ protocol CleanupOperation {
 /// Default implementations
 extension CleanupOperation {
     var id: String { String(describing: type(of: self)) }
+    var progressHandler: ((Double, String) -> Void)? {
+        get { nil }
+        set { }
+    }
 }

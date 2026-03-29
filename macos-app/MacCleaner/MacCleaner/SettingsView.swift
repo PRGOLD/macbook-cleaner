@@ -96,10 +96,39 @@ struct SettingsView: View {
             } footer: {
                 Text("Files accessed recently or below the minimum size will be skipped")
             }
+            
+            // Scheduled Cleanups Section
+            Section {
+                Toggle("Enable Scheduled Cleanups", isOn: Binding(
+                    get: { CleanupScheduler.shared.isScheduleEnabled },
+                    set: { CleanupScheduler.shared.isScheduleEnabled = $0 }
+                ))
+                
+                if CleanupScheduler.shared.isScheduleEnabled {
+                    Picker("Frequency", selection: Binding(
+                        get: { CleanupScheduler.shared.scheduleFrequency },
+                        set: { CleanupScheduler.shared.scheduleFrequency = $0 }
+                    )) {
+                        ForEach(CleanupScheduler.ScheduleFrequency.allCases, id: \.self) { frequency in
+                            Text(frequency.rawValue).tag(frequency)
+                        }
+                    }
+                    
+                    LabeledContent("Next Scheduled") {
+                        Text(CleanupScheduler.shared.nextScheduledDateString)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } header: {
+                Text("Scheduled Cleanups")
+            } footer: {
+                Text("Automatically run cleanup operations on a schedule")
+            }
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .frame(width: 500, height: 600)
+        .frame(width: 500, height: 700)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Reset to Defaults") {

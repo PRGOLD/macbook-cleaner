@@ -60,6 +60,14 @@ class DashboardViewModel: ObservableObject {
                        description: "Clear npm, Homebrew, CocoaPods caches") {
             try await CleanupEngine.clearDeveloperCaches()
         },
+        CleanupSection(id: "duplicates", icon: "doc.on.doc.fill", title: "Duplicate Files",
+                       description: "Find duplicate files to free up space") {
+            try await CleanupEngine.findDuplicateFiles()
+        },
+        CleanupSection(id: "largest", icon: "chart.bar.fill", title: "Largest Files",
+                       description: "Locate the biggest files eating up disk space") {
+            try await CleanupEngine.findLargestFiles()
+        },
         CleanupSection(id: "orphans", icon: "questionmark.folder.fill", title: "Orphaned App Data",
                        description: "Finds leftover files from deleted applications") {
             try await CleanupEngine.findOrphanedAppSupport()
